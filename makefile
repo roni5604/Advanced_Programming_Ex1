@@ -1,14 +1,30 @@
-CC = gcc
-CFLAGS = -Wall -Wextra -g
-TARGET = myshell
+# Define the compiler to use
+CC=gcc
 
-all: $(TARGET)
+# Define any compile-time flags
+CTYPE=-Wall -g
 
-$(TARGET): myshell.o
-	$(CC) $(CFLAGS) -o $(TARGET) myshell.o
+# Define the C source files
+SRCS=shell2.c
 
-myshell.o: myshell.c
-	$(CC) $(CFLAGS) -c myshell.c
+# Define the C object files 
+OBJS=$(SRCS:.c=.o)
+
+# Define the executable file 
+MAIN=myshell
+
+# The following part of the Makefile is generic; it can be used to 
+# build any executable just by changing the definitions above and by
+# deleting dependencies appended to the file from 'make depend'
+
+all:    $(MAIN)
+	@echo  Compiling $(MAIN) completed
+
+$(MAIN): $(OBJS) 
+	$(CC) $(CFLAGS) -o $(MAIN) $(OBJS)
+
+.c.o:
+	$(CC) $(CFLAGS) -c $<  -o $@
 
 clean:
-	rm -f *.o $(TARGET)
+	$(RM) *.o *~ $(MAIN)
