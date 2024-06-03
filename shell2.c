@@ -271,6 +271,31 @@ void execute_if_else() {
     }
 }
 
+// Handle the cat > filename command
+void handle_cat_command(char *filename) {
+    FILE *file = fopen(filename, "w");
+    if (!file) {
+        perror("fopen");
+        return;
+    }
+
+    char line[1024];
+    printf("Enter text (end with Ctrl-D):\n");
+    fflush(stdout);
+
+    // Disable raw mode for cat command
+    disable_raw_mode();
+
+    while (fgets(line, sizeof(line), stdin)) {
+        fprintf(file, "%s", line);
+    }
+
+    // Re-enable raw mode after cat command
+    enable_raw_mode();
+
+    fclose(file);
+}
+
 // Execute a command, handling built-in commands and piping
 int execute_command(char *command) {
     char *token;
@@ -371,6 +396,11 @@ int execute_command(char *command) {
             }
             if (strcmp(argv[0], "if") == 0) {
                 execute_if_else(); // Handle if/then/else
+                free(argv);
+                return 0;
+            }
+            if (strcmp(argv[0], "cat") == 0 && argv[1] != NULL && strcmp(argv[1], ">") == 0 && argv[2] != NULL) {
+                handle_cat_command(argv[2]); // Handle cat > filename
                 free(argv);
                 return 0;
             }
@@ -511,7 +541,7 @@ int main() {
                         replace_line(prompt, command);
                         i = strlen(command);
                         continue;
-                }
+            }
             } else if (ch == 3) { // Handle Control-C
                 ctrl_c_pressed = 1;
                 break;
