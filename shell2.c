@@ -13,6 +13,7 @@
 #define MAX_VARIABLES 100
 #define HISTORY_SIZE 100
 
+// Struct to store shell variables
 typedef struct {
     char name[50];
     char value[50];
@@ -552,7 +553,15 @@ int main() {
             strcpy(command, lastCommand);
         }
 
+        // Disable raw mode if command is a cat redirect
+        if (strstr(command, "cat >") == command) {
+            disable_raw_mode();
+        }
+
         execute_command(command);
+
+        // Re-enable raw mode
+        enable_raw_mode();
     }
 
     return 0;
